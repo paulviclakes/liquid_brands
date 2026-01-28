@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liquid Assets: Nigeria Beverage Industry Survey</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- FontAwesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <!-- Chosen Palette: Warm Neutral Background with Industry Specific Accents -->
+    <!-- Breweries: Amber/Gold (#d97706) -->
+    <!-- Water: Sky Blue (#0284c7) -->
+    <!-- Background: Stone (#fafaf9) -->
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        brew: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            800: '#92400e',
+                        },
+                        aqua: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            800: '#075985',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Chart Container Styling - Mandatory per instructions */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Max width to prevent stretching */
+            height: 350px;    /* Default responsive height */
+            max-height: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .chart-container-lg {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            max-height: 500px;
+        }
+
+        /* Smooth Transitions */
+        .tab-content {
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-[#fafaf9] text-gray-800 font-sans antialiased selection:bg-gray-200">
+
+    <!-- Application Structure Plan:
+         1. Header: Context setting (Hospitality Management Research).
+         2. Executive Dashboard: High-level metrics for both industries.
+         3. Industry Toggle Navigation: Switches the entire view between "Breweries" and "Table Water".
+         4. Industry Deep Dive (Dynamic):
+            - Market Overview (Charts).
+            - Major Players & Products (Cards).
+            - Location Survey (Interactive Data Table/Filter).
+         5. Strategic Analysis: Supply chain, logistics, and hospitality implications.
+         6. Footer: References.
+    -->
+
+    <!-- Visualization & Content Choices:
+         - Market Share -> Doughnut Chart -> Quick comparison of dominance (NB Plc vs others).
+         - Regional Distribution -> Bar Chart -> Visualizing the concentration of factories in SW Nigeria.
+         - Factory Database -> Searchable Table -> Efficiently handling the "Location & Brand" survey requirement without a wall of text.
+         - Qualitative Data -> Accordions -> Hiding dense text until requested by user interaction.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header Section -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-gray-900 text-white p-2 rounded-lg">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 font-serif leading-none">Liquids & Logistics</h1>
+                    <p class="text-xs text-gray-500 uppercase tracking-wide">Hospitality Management Research • Nigeria</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex space-x-6 text-sm font-medium text-gray-600">
+                <a href="#dashboard" class="hover:text-gray-900 transition">Dashboard</a>
+                <a href="#analysis" class="hover:text-gray-900 transition">Strategic Analysis</a>
+                <button onclick="window.print()" class="text-gray-900 border border-gray-300 px-3 py-1 rounded hover:bg-gray-50"><i class="fa-solid fa-print mr-1"></i> Print Report</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- Introduction Block -->
+        <section id="dashboard" class="mb-10 text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">A Survey of Nigeria's Beverage Manufacturing Landscape</h2>
+            <p class="text-gray-600 leading-relaxed text-lg">
+                Comprehensive research into the location, production, and branding of Breweries and Table Water factories within Nigeria. 
+                This interactive report analyzes market concentration, product portfolios, and regional distribution to inform procurement and supply chain strategies in hospitality management.
+            </p>
+        </section>
+
+        <!-- High Level Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10">
+            <!-- Metric 1 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Major Breweries</p>
+                    <p class="text-3xl font-bold text-gray-900">12+</p>
+                    <p class="text-xs text-green-600 mt-1"><i class="fa-solid fa-arrow-trend-up"></i> Consolidation Era</p>
+                </div>
+                <div class="bg-brew-100 p-3 rounded-full text-brew-600">
+                    <i class="fa-solid fa-beer-mug-empty text-xl"></i>
+                </div>
+            </div>
+            <!-- Metric 2 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Water Factories</p>
+                    <p class="text-3xl font-bold text-gray-900">4,500+</p>
+                    <p class="text-xs text-gray-500 mt-1">Highly Fragmented</p>
+                </div>
+                <div class="bg-aqua-100 p-3 rounded-full text-aqua-600">
+                    <i class="fa-solid fa-bottle-water text-xl"></i>
+                </div>
+            </div>
+            <!-- Metric 3 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Dominant Region</p>
+                    <p class="text-3xl font-bold text-gray-900">South West</p>
+                    <p class="text-xs text-gray-500 mt-1">Manufacturing Hub</p>
+                </div>
+                <div class="bg-gray-100 p-3 rounded-full text-gray-600">
+                    <i class="fa-solid fa-map-location-dot text-xl"></i>
+                </div>
+            </div>
+            <!-- Metric 4 -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Regulatory Body</p>
+                    <p class="text-3xl font-bold text-gray-900">NAFDAC</p>
+                    <p class="text-xs text-red-500 mt-1">Strict Compliance</p>
+                </div>
+                <div class="bg-red-50 p-3 rounded-full text-red-500">
+                    <i class="fa-solid fa-scale-balanced text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Interaction Controls -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-white p-1 rounded-lg shadow-sm border border-gray-200 inline-flex">
+                <button id="btn-breweries" onclick="switchTab('breweries')" class="px-6 py-2 rounded-md text-sm font-semibold transition-all duration-200 bg-brew-600 text-white shadow-md">
+                    <i class="fa-solid fa-beer-mug-empty mr-2"></i> Survey of Breweries
+                </button>
+                <button id="btn-water" onclick="switchTab('water')" class="px-6 py-2 rounded-md text-sm font-semibold text-gray-500 hover:text-gray-900 transition-all duration-200">
+                    <i class="fa-solid fa-bottle-water mr-2"></i> Survey of Table Water
+                </button>
+            </div>
+        </div>
+
+        <!-- SECTION A: BREWERIES CONTENT -->
+        <div id="content-breweries" class="tab-content fade-in space-y-8">
+            
+            <!-- Context Header -->
+            <div class="bg-white rounded-xl shadow-sm border-l-4 border-brew-500 p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">The Nigerian Brewing Landscape</h3>
+                <p class="text-gray-600">
+                    The Nigerian brewery sector is an oligopoly dominated by three major multinationals: <strong>Nigerian Breweries Plc (Heineken)</strong>, <strong>Guinness Nigeria Plc (Diageo)</strong>, and <strong>International Breweries Plc (AB InBev)</strong>. 
+                    Research indicates a strategic consolidation of production plants in the South-West and South-East regions, driven by proximity to ports (Lagos/Port Harcourt) and key consumer demographics.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Chart: Market Share -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Estimated Market Share by Volume</h4>
+                    <div class="chart-container">
+                        <canvas id="chartBreweriesShare"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4 italic text-center">Source: Financial reports & market analysis (2024 Estimates)</p>
+                </div>
+
+                <!-- Major Players Cards -->
+                <div class="space-y-4">
+                    <h4 class="text-lg font-bold text-gray-800 mb-2">Key Industry Players</h4>
+                    
+                    <!-- NB PLC -->
+                    <div class="group border border-gray-200 rounded-lg p-4 hover:border-brew-500 transition cursor-pointer bg-white" onclick="toggleDetails('nb-details')">
+                        <div class="flex justify-between items-center">
+                            <h5 class="font-bold text-gray-900">Nigerian Breweries Plc</h5>
+                            <i class="fa-solid fa-chevron-down text-gray-400 group-hover:text-brew-500"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">The market leader with the widest geographical footprint.</p>
+                        <div id="nb-details" class="hidden mt-3 pt-3 border-t border-gray-100 text-sm">
+                            <ul class="space-y-2">
+                                <li><span class="font-semibold text-gray-700">HQ:</span> Iganmu, Lagos State</li>
+                                <li><span class="font-semibold text-gray-700">Key Plants:</span> Lagos, Ibadan, Aba, Kaduna, Enugu, Ota, Ama (Enugu).</li>
+                                <li><span class="font-semibold text-gray-700">Flagship Brands:</span> Star, Gulder, Heineken, Legend Extra Stout, Maltina, Amstel Malta, Goldberg, Life.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Guinness -->
+                    <div class="group border border-gray-200 rounded-lg p-4 hover:border-brew-500 transition cursor-pointer bg-white" onclick="toggleDetails('gn-details')">
+                        <div class="flex justify-between items-center">
+                            <h5 class="font-bold text-gray-900">Guinness Nigeria Plc</h5>
+                            <i class="fa-solid fa-chevron-down text-gray-400 group-hover:text-brew-500"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">Historically significant, focused on premium spirits and stouts.</p>
+                        <div id="gn-details" class="hidden mt-3 pt-3 border-t border-gray-100 text-sm">
+                            <ul class="space-y-2">
+                                <li><span class="font-semibold text-gray-700">HQ:</span> Ikeja, Lagos State</li>
+                                <li><span class="font-semibold text-gray-700">Key Plants:</span> Ogba (Lagos), Benin City (Edo).</li>
+                                <li><span class="font-semibold text-gray-700">Flagship Brands:</span> Guinness Foreign Extra Stout, Harp, Orijin, Satzenbrau, Malta Guinness, Dubic Malt.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                     <!-- International Breweries -->
+                     <div class="group border border-gray-200 rounded-lg p-4 hover:border-brew-500 transition cursor-pointer bg-white" onclick="toggleDetails('ib-details')">
+                        <div class="flex justify-between items-center">
+                            <h5 class="font-bold text-gray-900">International Breweries Plc</h5>
+                            <i class="fa-solid fa-chevron-down text-gray-400 group-hover:text-brew-500"></i>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">The challenger brand (AB InBev) with aggressive regional pricing.</p>
+                        <div id="ib-details" class="hidden mt-3 pt-3 border-t border-gray-100 text-sm">
+                            <ul class="space-y-2">
+                                <li><span class="font-semibold text-gray-700">HQ:</span> Lagos (Operational) / Ilesa (Registered)</li>
+                                <li><span class="font-semibold text-gray-700">Key Plants:</span> Ilesa (Osun), Onitsha (Anambra), Port Harcourt (Rivers), Gateway Plant (Ogun).</li>
+                                <li><span class="font-semibold text-gray-700">Flagship Brands:</span> Trophy, Hero, Budweiser, Beta Malt, Grand Malt.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brewery Database Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center flex-wrap gap-3">
+                    <h4 class="font-bold text-gray-800"><i class="fa-solid fa-list-ul mr-2"></i>Factory Location & Product Survey</h4>
+                    <input type="text" id="brewerySearch" placeholder="Search by State or Brand..." class="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:border-brew-500 w-64">
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-100 text-gray-600 font-semibold">
+                            <tr>
+                                <th class="p-4">Brewery Name</th>
+                                <th class="p-4">Location (State)</th>
+                                <th class="p-4">Key Products/Brands</th>
+                                <th class="p-4">Type</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breweryTableBody" class="divide-y divide-gray-100">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 text-center text-xs text-gray-400 bg-gray-50">
+                    Showing selected representative sample for study purposes.
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION B: WATER CONTENT -->
+        <div id="content-water" class="tab-content hidden space-y-8">
+            
+             <!-- Context Header -->
+             <div class="bg-white rounded-xl shadow-sm border-l-4 border-aqua-500 p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-2">The Table Water Industry Survey</h3>
+                <p class="text-gray-600">
+                    Unlike the consolidated brewery sector, the Nigerian table water industry is highly fragmented. While major brands (Nestle, Coca-Cola) dominate the premium bottle segment, thousands of SMEs operate in the sachet ("pure water") and dispenser jar market. 
+                    <span class="text-aqua-700 font-semibold">Location Strategy:</span> Factories are typically located near rapid urbanization centers and reliable aquifers, with heavy concentration in Lagos, Ogun, and Kano.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Chart: Water Regional -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Factory Density by Geopolitical Zone</h4>
+                    <div class="chart-container-lg">
+                        <canvas id="chartWaterDensity"></canvas>
+                    </div>
+                </div>
+
+                <!-- Insight Cards -->
+                <div class="space-y-4">
+                    <div class="bg-blue-50 p-5 rounded-lg border border-blue-100">
+                        <h5 class="font-bold text-blue-800 mb-2"><i class="fa-solid fa-certificate mr-2"></i>NAFDAC Regulation</h5>
+                        <p class="text-sm text-gray-700">
+                            The National Agency for Food and Drug Administration and Control (NAFDAC) mandates that every water factory must have a unique NAFDAC registration number. This number is the primary indicator of safety for hospitality procurement.
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white p-5 rounded-lg border border-gray-200">
+                        <h5 class="font-bold text-gray-800 mb-2">Product Categories</h5>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><i class="fa-solid fa-bottle-water"></i></div>
+                                <div>
+                                    <p class="text-sm font-bold">Premium PET</p>
+                                    <p class="text-xs text-gray-500">Hotels & Restaurants (Eva, Nestle)</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><i class="fa-solid fa-glass-water"></i></div>
+                                <div>
+                                    <p class="text-sm font-bold">Dispenser (19L)</p>
+                                    <p class="text-xs text-gray-500">Corporate & Events (Cway, Ragolis)</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><i class="fa-solid fa-bag-shopping"></i></div>
+                                <div>
+                                    <p class="text-sm font-bold">Sachet Water</p>
+                                    <p class="text-xs text-gray-500">Mass Market (Local SMEs)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Water Brand Database -->
+             <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center flex-wrap gap-3">
+                    <h4 class="font-bold text-gray-800"><i class="fa-solid fa-droplet mr-2"></i>Major Table Water Factories Survey</h4>
+                    <select id="waterRegionFilter" class="text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:border-aqua-500">
+                        <option value="all">All Regions</option>
+                        <option value="Lagos">Lagos</option>
+                        <option value="Abuja">Abuja</option>
+                        <option value="South East">South East</option>
+                        <option value="North">North</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-100 text-gray-600 font-semibold">
+                            <tr>
+                                <th class="p-4">Brand/Label</th>
+                                <th class="p-4">Manufacturer</th>
+                                <th class="p-4">Factory Location</th>
+                                <th class="p-4">Market Segment</th>
+                            </tr>
+                        </thead>
+                        <tbody id="waterTableBody" class="divide-y divide-gray-100">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Strategic Analysis Section (Common) -->
+        <section id="analysis" class="mt-16 pt-10 border-t border-gray-200">
+            <h2 class="text-2xl font-serif font-bold text-gray-900 mb-6 flex items-center">
+                <i class="fa-solid fa-magnifying-glass-chart mr-3 text-gray-400"></i>Strategic Analysis for Hospitality Management
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-gray-800">
+                    <h3 class="font-bold text-lg mb-3">Supply Chain & Logistics</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        The concentration of breweries in the South-West necessitates robust logistics for Northern and Eastern delivery. For hospitality managers, this implies differing procurement lead times based on location.
+                    </p>
+                    <ul class="text-sm list-disc pl-4 text-gray-500 space-y-1">
+                        <li>High transport costs affect final pricing.</li>
+                        <li>Depot systems used by NB and Guinness ease distribution.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-gray-800">
+                    <h3 class="font-bold text-lg mb-3">Quality Assurance (Water)</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        With the proliferation of substandard "pure water" factories, hotels must rigorously vet suppliers.
+                    </p>
+                    <div class="bg-yellow-50 p-3 rounded text-xs text-yellow-800">
+                        <strong>Checklist:</strong>
+                        <br>1. Verify NAFDAC Number online.
+                        <br>2. Inspect factory hygiene (site visit).
+                        <br>3. Check seal integrity (safety rings).
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-gray-800">
+                    <h3 class="font-bold text-lg mb-3">Brand Loyalty Trends</h3>
+                    <p class="text-sm text-gray-600 mb-4">
+                        Regional loyalty is strong in Nigeria.
+                    </p>
+                    <ul class="text-sm space-y-2">
+                        <li class="flex justify-between border-b border-gray-100 pb-1">
+                            <span>South East</span>
+                            <span class="font-semibold text-gray-800">Hero, Life</span>
+                        </li>
+                        <li class="flex justify-between border-b border-gray-100 pb-1">
+                            <span>South West</span>
+                            <span class="font-semibold text-gray-800">Trophy, Goldberg</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span>North</span>
+                            <span class="font-semibold text-gray-800">Maltina, Coke (Non-Alc)</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-10 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="mb-2 text-white font-serif text-lg">Hospitality & Tourism Management Research</p>
+            <p class="text-sm mb-6">Generated for Academic Survey Purposes • Focused on Nigerian Domestic Market</p>
+            <div class="flex justify-center gap-4 text-xs">
+                <span>Data Sources: NAFDAC Registry</span>
+                <span>•</span>
+                <span>Company Annual Reports (2023/2024)</span>
+                <span>•</span>
+                <span>NBS Manufacturing Statistics</span>
+            </div>
+            <p class="mt-8 text-xs text-gray-600">This interactive report compiles location and product data for educational use.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA DATASETS ---
+
+        // Brewery Data (Representative Sample)
+        const breweryData = [
+            { name: "Nigerian Breweries Plc (Lagos)", location: "Iganmu, Lagos", products: "Star, Gulder, Heineken, Maltina", type: "Multinational" },
+            { name: "Nigerian Breweries Plc (Ama)", location: "Ama, Enugu State", products: "Star, Gulder, Life, Legend", type: "Multinational" },
+            { name: "Nigerian Breweries Plc (Ibadan)", location: "Ibadan, Oyo State", products: "Goldberg, Maltina, Amstel Malta", type: "Multinational" },
+            { name: "Nigerian Breweries Plc (Kaduna)", location: "Kakuri, Kaduna State", products: "Maltina, Northern brands", type: "Multinational" },
+            { name: "Guinness Nigeria Plc (Ikeja)", location: "Ogba, Lagos", products: "Guinness Stout, Harp, Orijin, Malta Guinness", type: "Multinational" },
+            { name: "Guinness Nigeria Plc (Benin)", location: "Benin City, Edo State", products: "Guinness, Harp, Dubic Malt", type: "Multinational" },
+            { name: "International Breweries (Gateway)", location: "Bara, Ogun State", products: "Trophy, Budweiser, Beta Malt", type: "Multinational" },
+            { name: "International Breweries (Ilesa)", location: "Ilesa, Osun State", products: "Trophy, Grand Malt", type: "Multinational" },
+            { name: "International Breweries (Onitsha)", location: "Onitsha, Anambra State", products: "Hero, Grand Malt", type: "Multinational" },
+            { name: "International Breweries (PH)", location: "Port Harcourt, Rivers", products: "Hero, Budweiser", type: "Multinational" },
+            { name: "Champion Breweries", location: "Uyo, Akwa Ibom", products: "Champion Lager, Champ Malta", type: "Regional" },
+            { name: "Jos International Breweries", location: "Jos, Plateau State", products: "Rock Lager (Historic)", type: "Regional" },
+            { name: "Golden Guinea Breweries", location: "Umuahia, Abia State", products: "Golden Guinea, Bergedorf", type: "Regional" },
+            { name: "Intafact Beverages (SABMiller)", location: "Onitsha, Anambra", products: "Hero (Origin)", type: "Subsidiary" } // Note: Now part of IB Plc but listed for historical context
+        ];
+
+        // Water Data (Representative Sample of Major Brands)
+        const waterData = [
+            { brand: "Eva Water", manufacturer: "Nigerian Bottling Company", location: "Agidingbi (Lagos), Asejire (Oyo), Abuja", segment: "Premium", region: "All" },
+            { brand: "Nestle Pure Life", manufacturer: "Nestle Nigeria Plc", location: "Abaji (FCT), Agbara (Ogun)", segment: "Premium", region: "All" },
+            { brand: "Cway Water", manufacturer: "Cway Nigeria Drinking Water", location: "Isolo (Lagos), Ota (Ogun)", segment: "Dispenser Leader", region: "Lagos" },
+            { brand: "Ragolis Water", manufacturer: "Ragolis Waters Ltd", location: "Ikorodu, Lagos", segment: "Mid-Market", region: "Lagos" },
+            { brand: "Swan Water", manufacturer: "UAC of Nigeria (Spring Waters)", location: "Kerang Hills, Jos, Plateau", segment: "Premium Spring", region: "North" },
+            { brand: "Aquafina", manufacturer: "Seven-Up Bottling Co", location: "Ikeja, Lagos / Kano / Aba", segment: "Premium", region: "All" },
+            { brand: "Gossy Water", manufacturer: "UACN (Warm Spring)", location: "Ikogosi, Ekiti State", segment: "Spring Water", region: "South West" },
+            { brand: "Aquadana", manufacturer: "Dana Group", location: "Ibadan, Oyo State", segment: "Mid-Market", region: "South West" },
+            { brand: "Bigi Water", manufacturer: "Rite Foods Ltd", location: "Ososa, Ogun State", segment: "Mass Market", region: "South West" },
+            { brand: "Lasena Water", manufacturer: "Lasena Artesian", location: "Ogba, Lagos", segment: "Niche/Alkaline", region: "Lagos" },
+            { brand: "Table Water (Generic SMEs)", manufacturer: "Various Local Factories", location: "Nationwide (High Density in Owerri, Aba)", segment: "Sachet/Budget", region: "South East" }
+        ];
+
+        // --- CHART CONFIGURATION ---
+
+        let breweryChartInstance = null;
+        let waterChartInstance = null;
+
+        function initCharts() {
+            // Brewery Market Share Chart
+            const ctxBrew = document.getElementById('chartBreweriesShare').getContext('2d');
+            breweryChartInstance = new Chart(ctxBrew, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Nigerian Breweries Plc', 'International Breweries', 'Guinness Nigeria', 'Others (Regional)'],
+                    datasets: [{
+                        data: [55, 25, 15, 5], // Estimated breakdown
+                        backgroundColor: ['#d97706', '#f59e0b', '#1f2937', '#9ca3af'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Water Density Chart
+            const ctxWater = document.getElementById('chartWaterDensity').getContext('2d');
+            waterChartInstance = new Chart(ctxWater, {
+                type: 'bar',
+                data: {
+                    labels: ['South West (Lagos/Ogun)', 'South East', 'South South', 'North Central', 'North West', 'North East'],
+                    datasets: [{
+                        label: 'Estimated Factory Density (%)',
+                        data: [45, 20, 15, 10, 7, 3],
+                        backgroundColor: '#0ea5e9',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: { beginAtZero: true, max: 100, title: { display: true, text: 'Percentage of Total Registered Factories' } }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- UI INTERACTION LOGIC ---
+
+        // Tab Switching
+        function switchTab(tabName) {
+            const brewContent = document.getElementById('content-breweries');
+            const waterContent = document.getElementById('content-water');
+            const btnBrew = document.getElementById('btn-breweries');
+            const btnWater = document.getElementById('btn-water');
+
+            if (tabName === 'breweries') {
+                brewContent.classList.remove('hidden');
+                waterContent.classList.add('hidden');
+                
+                // Style Active Button
+                btnBrew.className = "px-6 py-2 rounded-md text-sm font-semibold transition-all duration-200 bg-brew-600 text-white shadow-md";
+                btnWater.className = "px-6 py-2 rounded-md text-sm font-semibold text-gray-500 hover:text-gray-900 transition-all duration-200";
+            } else {
+                brewContent.classList.add('hidden');
+                waterContent.classList.remove('hidden');
+                
+                // Style Active Button
+                btnWater.className = "px-6 py-2 rounded-md text-sm font-semibold transition-all duration-200 bg-aqua-600 text-white shadow-md";
+                btnBrew.className = "px-6 py-2 rounded-md text-sm font-semibold text-gray-500 hover:text-gray-900 transition-all duration-200";
+            }
+        }
+
+        // Expandable Details
+        function toggleDetails(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                el.classList.add('fade-in');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        // Table Population & Filtering
+        function renderTables() {
+            // Render Brewery Table
+            const brewBody = document.getElementById('breweryTableBody');
+            brewBody.innerHTML = breweryData.map(item => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="p-4 font-medium text-gray-900">${item.name}</td>
+                    <td class="p-4 text-gray-600">${item.location}</td>
+                    <td class="p-4 text-gray-600">${item.products}</td>
+                    <td class="p-4 text-xs"><span class="bg-gray-200 px-2 py-1 rounded text-gray-700">${item.type}</span></td>
+                </tr>
+            `).join('');
+
+            // Render Water Table (Initial)
+            filterWaterTable('all');
+        }
+
+        function filterBreweryTable(query) {
+            const lowerQuery = query.toLowerCase();
+            const filtered = breweryData.filter(item => 
+                item.name.toLowerCase().includes(lowerQuery) || 
+                item.location.toLowerCase().includes(lowerQuery) ||
+                item.products.toLowerCase().includes(lowerQuery)
+            );
+            
+            const brewBody = document.getElementById('breweryTableBody');
+            if (filtered.length === 0) {
+                brewBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No breweries found matching "${query}"</td></tr>`;
+            } else {
+                brewBody.innerHTML = filtered.map(item => `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="p-4 font-medium text-gray-900">${item.name}</td>
+                        <td class="p-4 text-gray-600">${item.location}</td>
+                        <td class="p-4 text-gray-600">${item.products}</td>
+                        <td class="p-4 text-xs"><span class="bg-gray-200 px-2 py-1 rounded text-gray-700">${item.type}</span></td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function filterWaterTable(region) {
+            let filtered = waterData;
+            if (region !== 'all') {
+                filtered = waterData.filter(item => item.region === region || item.region === 'All' || item.location.includes(region));
+            }
+            
+            const waterBody = document.getElementById('waterTableBody');
+            waterBody.innerHTML = filtered.map(item => `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="p-4 font-medium text-gray-900">${item.brand}</td>
+                    <td class="p-4 text-gray-600">${item.manufacturer}</td>
+                    <td class="p-4 text-gray-600">${item.location}</td>
+                    <td class="p-4 text-xs"><span class="bg-aqua-50 text-aqua-700 px-2 py-1 rounded border border-aqua-100">${item.segment}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            renderTables();
+
+            // Search Listener for Brewery
+            document.getElementById('brewerySearch').addEventListener('input', (e) => {
+                filterBreweryTable(e.target.value);
+            });
+
+            // Filter Listener for Water
+            document.getElementById('waterRegionFilter').addEventListener('change', (e) => {
+                filterWaterTable(e.target.value);
+            });
+        });
+
+    </script>
+</body>
+</html>
